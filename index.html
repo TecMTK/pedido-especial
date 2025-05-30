@@ -38,6 +38,7 @@
       border-radius: 10px;
       cursor: pointer;
       transition: all 0.3s ease;
+      position: relative; /* manter posição relativa para manipulação */
     }
     .yes {
       background-color: #e91e63;
@@ -84,7 +85,7 @@
   <div class="heart">💋</div>
   <div>
     <button class="yes" onclick="respostaSim()">Sim! 😘</button>
-    <button class="no" onmouseover="foge(this)">Não 😅</button>
+    <button class="no" id="botaoNao" onmouseover="foge(this)">Não 😅</button>
   </div>
 
   <div id="blackout"></div>
@@ -98,6 +99,7 @@
   <script>
     const audio1 = document.getElementById('audio1');
     const audio2 = document.getElementById('audio2');
+    const botaoNao = document.getElementById('botaoNao');
 
     // Quando terminar o primeiro áudio, inicia o segundo
     audio1.addEventListener('ended', () => {
@@ -118,12 +120,65 @@
       }, 1000);
     }
 
+    // Função para fugir no desktop com mouseover (como antes)
     function foge(btn) {
       const x = Math.floor(Math.random() * (window.innerWidth - 100));
       const y = Math.floor(Math.random() * (window.innerHeight - 100));
       btn.style.position = "absolute";
       btn.style.left = x + "px";
       btn.style.top = y + "px";
+    }
+
+    // Detectar se é dispositivo móvel
+    function isMobile() {
+      return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+    }
+
+    // Se for celular, ao tocar no botão "Não", começa o movimento de desaparece/aparece + vai e vem
+    if (isMobile()) {
+      botaoNao.addEventListener('click', () => {
+        let posX = 0;
+        let posY = 0;
+        let dirX = 1;
+        let dirY = 1;
+        let opacity = 1;
+        let fadeOut = true;
+
+        botaoNao.style.position = 'absolute';
+
+        const velocidade = 4;
+        const limiteX = window.innerWidth - botaoNao.offsetWidth;
+        const limiteY = window.innerHeight - botaoNao.offsetHeight;
+
+        // Remove o comportamento do mouseover para celular para evitar conflito
+        botaoNao.onmouseover = null;
+
+        const intervalo = setInterval(() => {
+          // Atualiza posição
+          posX += dirX * velocidade;
+          posY += dirY * velocidade;
+
+          // Inverter direção nas bordas
+          if (posX >= limiteX) dirX = -1;
+          if (posX <= 0) dirX = 1;
+          if (posY >= limiteY) dirY = -1;
+          if (posY <= 0) dirY = 1;
+
+          botaoNao.style.left = posX + 'px';
+          botaoNao.style.top = posY + 'px';
+
+          // Controle de opacidade para piscar
+          if (fadeOut) {
+            opacity -= 0.05;
+            if (opacity <= 0.1) fadeOut = false;
+          } else {
+            opacity += 0.05;
+            if (opacity >= 1) fadeOut = true;
+          }
+          botaoNao.style.opacity = opacity;
+
+        }, 30);
+      });
     }
 
     function desenharCoracao() {
