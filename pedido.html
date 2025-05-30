@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Convite Especial</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: url('https://images.unsplash.com/photo-1616627982406-678398f92b08?fit=crop&w=1500&q=80') no-repeat center center fixed;
+      background-size: cover;
+      text-align: center;
+      padding: 50px;
+      overflow: hidden;
+      transition: background 1s;
+    }
+    h1 {
+      font-size: 3em;
+      color: #fff;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 10px black;
+    }
+    .heart {
+      font-size: 5em;
+      color: red;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    button {
+      margin: 20px;
+      padding: 15px 30px;
+      font-size: 1.5em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .yes {
+      background-color: #e91e63;
+      color: white;
+    }
+    .no {
+      background-color: #9c27b0;
+      color: white;
+      position: relative;
+    }
+    canvas {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+    #blackout {
+      background-color: black;
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 9;
+      display: none;
+    }
+    #finalMessage {
+      display: none;
+      color: white;
+      font-size: 2em;
+      position: absolute;
+      top: 80%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 11;
+      text-shadow: 2px 2px 8px black;
+    }
+  </style>
+</head>
+<body>
+  <h1>Você aceita ir no motel comigo? 🔥</h1>
+  <div class="heart">💋</div>
+  <div>
+    <button class="yes" onclick="respostaSim()">Sim! 😘</button>
+    <button class="no" onmouseover="foge(this)">Não 😅</button>
+  </div>
+
+  <div id="blackout"></div>
+  <canvas id="heartCanvas" width="400" height="400"></canvas>
+  <div id="finalMessage">Então vamos fazer essa noite inesquecível... 💞</div>
+
+  <!-- Áudios -->
+  <audio id="audio1" src="Gravado.mp3"></audio>
+  <audio id="audio2" src="sexy.mp3"></audio>
+
+  <script>
+    const audio1 = document.getElementById('audio1');
+    const audio2 = document.getElementById('audio2');
+
+    // Quando terminar o primeiro áudio, inicia o segundo
+    audio1.addEventListener('ended', () => {
+      audio2.play();
+    });
+
+    function respostaSim() {
+      document.querySelector('h1').style.display = 'none';
+      document.querySelector('.heart').style.display = 'none';
+      document.querySelector('.yes').style.display = 'none';
+      document.querySelector('.no').style.display = 'none';
+
+      const blackout = document.getElementById('blackout');
+      blackout.style.display = 'block';
+
+      setTimeout(() => {
+        desenharCoracao();
+      }, 1000);
+    }
+
+    function foge(btn) {
+      const x = Math.floor(Math.random() * (window.innerWidth - 100));
+      const y = Math.floor(Math.random() * (window.innerHeight - 100));
+      btn.style.position = "absolute";
+      btn.style.left = x + "px";
+      btn.style.top = y + "px";
+    }
+
+    function desenharCoracao() {
+      const canvas = document.getElementById('heartCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.style.display = 'block';
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 4;
+
+      let t = 0;
+      const draw = () => {
+        const x = 200 + 100 * Math.sin(t) ** 3;
+        const y = 200 - (60 * Math.cos(t) - 20 * Math.cos(2 * t) - 10 * Math.cos(3 * t) - 5 * Math.cos(4 * t));
+        if (t === 0) {
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+          ctx.stroke();
+        }
+
+        t += 0.02;
+        if (t < Math.PI * 2) {
+          requestAnimationFrame(draw);
+        } else {
+          mostrarMensagemFinal();
+        }
+      };
+      draw();
+    }
+
+    function mostrarMensagemFinal() {
+      const msg = document.getElementById('finalMessage');
+      msg.style.display = 'block';
+      audio1.play(); // inicia a sequência dos dois áudios
+    }
+  </script>
+</body>
+</html>
